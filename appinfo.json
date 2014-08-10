@@ -36,11 +36,6 @@
                 "type": "png"
             },
             {
-                "file": "images/BatteryIconCharging10.png",
-                "name": "BAT_ICON_CHARGEING_10",
-                "type": "png"
-            },
-            {
                 "file": "images/BatteryIconCharging90.png",
                 "name": "BAT_ICON_CHARGEING_90",
                 "type": "png"
