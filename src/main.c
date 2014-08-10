@@ -3,41 +3,39 @@
 Window *window;
 TextLayer *time_layer, *date_layer;
 InverterLayer *inv_layer;
-GContext *bat_context;
 GBitmap *bat_bitmap, *bat_10_bitmap, *bat_90_bitmap, *bat_empty_bitmap, *bat_empty_10_bitmap, *bat_empty_90_bitmap;
 BitmapLayer *bat_10_layer, *bat_20_layer, *bat_30_layer, *bat_40_layer, *bat_50_layer, *bat_60_layer, *bat_70_layer, *bat_80_layer, *bat_90_layer;
 
 void handle_timetick(struct tm *tick_time, TimeUnits units_changed){
+  //set date and time buffers
   static char time_buffer[10];
   static char date_buffer[20];
-  
   if (clock_is_24h_style()) {
     strftime(time_buffer, sizeof(time_buffer), "%H:%M", tick_time);
   } else {
     strftime(time_buffer, sizeof(time_buffer), "%I:%M", tick_time);
   }
-  
   strftime(date_buffer, sizeof(date_buffer), "%b %d", tick_time);
+  
+  //set text layers to display date and time buffers
   text_layer_set_text(time_layer, time_buffer);
   text_layer_set_text(date_layer, date_buffer);
 }
 
-void handle_battery(BatteryChargeState charge) {
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Battery Change");
-  int battery_percent = charge.charge_percent;
-      
+void handle_battery(BatteryChargeState charge) {      
+  //change battery bitmaps if charging
   if (charge.is_charging) {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Battery Chargeing");
     bat_empty_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_CHARGEING);
     bat_empty_10_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_CHARGEING_10);
     bat_empty_90_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_CHARGEING_90);
   } else {
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "Battery Not Chargeing");
     bat_empty_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_EMPTY);
     bat_empty_10_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_EMPTY);
     bat_empty_90_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_EMPTY);
   }
   
+  //change battery bitmap and bitmap layers based on battery percent
+  int battery_percent = charge.charge_percent;
   if (battery_percent >= 100){
     bat_10_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CHARGED_ICON);
     bat_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CHARGED_ICON);
@@ -47,7 +45,6 @@ void handle_battery(BatteryChargeState charge) {
     bat_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON);
     bat_90_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_90);
   }
-  
   if(battery_percent >= 10) {
     bitmap_layer_set_bitmap(bat_10_layer, bat_10_bitmap);
   } else {
@@ -165,10 +162,19 @@ void handle_init(void) {
 }
 
 void handle_deinit(void) {
+  //unubscribe from time and battery updates
+  tick_timer_service_unsubscribe();
+  battery_state_service_unsubscribe();
+  
+  //end bitmap refernces
   gbitmap_destroy(bat_bitmap);
   gbitmap_destroy(bat_10_bitmap);
   gbitmap_destroy(bat_90_bitmap);
-  
+  gbitmap_destroy(bat_empty_bitmap);
+  gbitmap_destroy(bat_empty_90_bitmap);
+  gbitmap_destroy(bat_empty_10_bitmap);
+
+  //end bitmap layers
   bitmap_layer_destroy(bat_10_layer);
   bitmap_layer_destroy(bat_20_layer);
   bitmap_layer_destroy(bat_30_layer);
@@ -178,12 +184,11 @@ void handle_deinit(void) {
   bitmap_layer_destroy(bat_70_layer);
   bitmap_layer_destroy(bat_80_layer);
   bitmap_layer_destroy(bat_90_layer);
-
-  tick_timer_service_unsubscribe();
-  battery_state_service_unsubscribe();
-  inverter_layer_destroy(inv_layer);
+  
+  //end text layers and window
   text_layer_destroy(time_layer);
   text_layer_destroy(date_layer);
+  inverter_layer_destroy(inv_layer);
   window_destroy(window);
 }
 

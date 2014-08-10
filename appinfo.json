@@ -65,18 +65,6 @@
                 "file": "images/BatteryIcon.png",
                 "name": "BAT_ICON",
                 "type": "png"
-            },
-            {
-                "characterRegex": "[o0-9:]",
-                "file": "fonts/KARNIVOR.ttf",
-                "name": "KARNIVOR_49",
-                "type": "font"
-            },
-            {
-                "characterRegex": "[A-Za-z0-9:]",
-                "file": "fonts/KARNIVOR.ttf",
-                "name": "KARNIVOR_16",
-                "type": "font"
             }
         ]
     },
