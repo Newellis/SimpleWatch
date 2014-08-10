@@ -2,7 +2,7 @@
 
 Window *window;
 TextLayer *time_layer, *date_layer;
-InverterLayer *inv_layer, *charge_layer;
+InverterLayer *inv_layer;
 GContext *bat_context;
 GBitmap *bat_bitmap, *bat_10_bitmap, *bat_90_bitmap, *bat_empty_bitmap, *bat_empty_10_bitmap, *bat_empty_90_bitmap;
 BitmapLayer *bat_10_layer, *bat_20_layer, *bat_30_layer, *bat_40_layer, *bat_50_layer, *bat_60_layer, *bat_70_layer, *bat_80_layer, *bat_90_layer;
@@ -25,9 +25,7 @@ void handle_timetick(struct tm *tick_time, TimeUnits units_changed){
 void handle_battery(BatteryChargeState charge) {
   APP_LOG(APP_LOG_LEVEL_DEBUG, "Battery Change");
   int battery_percent = charge.charge_percent;
-    
-  charge_layer = inverter_layer_create(GRect(0, 0, 144, 8));
-  
+      
   if (charge.is_charging) {
     APP_LOG(APP_LOG_LEVEL_DEBUG, "Battery Chargeing");
     bat_empty_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_CHARGEING);
@@ -111,7 +109,6 @@ void handle_init(void) {
   bat_70_layer = bitmap_layer_create(GRect(96, 0, 16, 8));
   bat_80_layer = bitmap_layer_create(GRect(112, 0, 16, 8));
   bat_90_layer = bitmap_layer_create(GRect(128, 0, 16, 8));
-  charge_layer = inverter_layer_create(GRect(0, 0, 144, 8));
 
   bat_10_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_10);
   bat_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON);
@@ -135,54 +132,14 @@ void handle_init(void) {
   text_layer_set_font(date_layer, fonts_load_custom_font(date_font_handle));
   text_layer_set_text_alignment(date_layer, GTextAlignmentCenter);
   
+  //set Time to current value
+  time_t now = time(NULL);
+  struct tm *current_time = localtime(&now);
+  handle_timetick(current_time, MINUTE_UNIT);
+  
   //set Battery bar to correct value
   BatteryChargeState charge_state = battery_state_service_peek();
-  int battery_percent = charge_state.charge_percent;
-  if(battery_percent >= 10) {
-    bitmap_layer_set_bitmap(bat_10_layer, bat_10_bitmap);
-  } else {
-    bitmap_layer_set_bitmap(bat_10_layer, bat_empty_bitmap);
-  }
-  if(battery_percent >= 20) {
-    bitmap_layer_set_bitmap(bat_20_layer, bat_bitmap);
-  } else {
-    bitmap_layer_set_bitmap(bat_20_layer, bat_empty_bitmap);
-  }
-  if(battery_percent >= 30) {
-    bitmap_layer_set_bitmap(bat_30_layer, bat_bitmap);
-  } else {
-    bitmap_layer_set_bitmap(bat_30_layer, bat_empty_bitmap);
-  }
-  if(battery_percent >= 40) {
-    bitmap_layer_set_bitmap(bat_40_layer, bat_bitmap);
-  } else {
-    bitmap_layer_set_bitmap(bat_40_layer, bat_empty_bitmap);
-  }
-  if(battery_percent >= 50) {
-    bitmap_layer_set_bitmap(bat_50_layer, bat_bitmap);
-  } else {
-    bitmap_layer_set_bitmap(bat_50_layer, bat_empty_bitmap);
-  }
-  if(battery_percent >= 60) {
-    bitmap_layer_set_bitmap(bat_60_layer, bat_bitmap);
-  } else {
-    bitmap_layer_set_bitmap(bat_60_layer, bat_empty_bitmap);
-  }
-  if(battery_percent >= 70) {
-    bitmap_layer_set_bitmap(bat_70_layer, bat_bitmap);
-  } else {
-    bitmap_layer_set_bitmap(bat_70_layer, bat_empty_bitmap);
-  }
-  if(battery_percent >= 80) {
-    bitmap_layer_set_bitmap(bat_80_layer, bat_bitmap);
-  } else {
-    bitmap_layer_set_bitmap(bat_80_layer, bat_empty_bitmap);
-  }
-  if(battery_percent >= 90) {
-    bitmap_layer_set_bitmap(bat_90_layer, bat_90_bitmap);
-  } else {
-    bitmap_layer_set_bitmap(bat_90_layer, bat_empty_bitmap);
-  }
+  handle_battery(charge_state);
   
   //add layers to the window
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(time_layer));
@@ -198,10 +155,9 @@ void handle_init(void) {
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bat_70_layer));
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bat_80_layer));
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bat_90_layer));
-  layer_add_child(window_get_root_layer(window), (Layer*) charge_layer);
   
   //Inverter layer
-  inv_layer = inverter_layer_create(GRect(0, 8, 144, 160));
+  inv_layer = inverter_layer_create(GRect(0, 0, 144, 168));
   layer_add_child(window_get_root_layer(window), (Layer*) inv_layer);
   
   //push the Window
@@ -225,7 +181,6 @@ void handle_deinit(void) {
 
   tick_timer_service_unsubscribe();
   battery_state_service_unsubscribe();
-  inverter_layer_destroy(charge_layer);
   inverter_layer_destroy(inv_layer);
   text_layer_destroy(time_layer);
   text_layer_destroy(date_layer);
