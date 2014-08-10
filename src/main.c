@@ -1,0 +1,239 @@
+#include <pebble.h>
+
+Window *window;
+TextLayer *time_layer, *date_layer;
+InverterLayer *inv_layer, *charge_layer;
+GContext *bat_context;
+GBitmap *bat_bitmap, *bat_10_bitmap, *bat_90_bitmap, *bat_empty_bitmap, *bat_empty_10_bitmap, *bat_empty_90_bitmap;
+BitmapLayer *bat_10_layer, *bat_20_layer, *bat_30_layer, *bat_40_layer, *bat_50_layer, *bat_60_layer, *bat_70_layer, *bat_80_layer, *bat_90_layer;
+
+void handle_timetick(struct tm *tick_time, TimeUnits units_changed){
+  static char time_buffer[10];
+  static char date_buffer[20];
+  
+  if (clock_is_24h_style()) {
+    strftime(time_buffer, sizeof(time_buffer), "%H:%M", tick_time);
+  } else {
+    strftime(time_buffer, sizeof(time_buffer), "%I:%M", tick_time);
+  }
+  
+  strftime(date_buffer, sizeof(date_buffer), "%b %d", tick_time);
+  text_layer_set_text(time_layer, time_buffer);
+  text_layer_set_text(date_layer, date_buffer);
+}
+
+void handle_battery(BatteryChargeState charge) {
+  APP_LOG(APP_LOG_LEVEL_DEBUG, "Battery Change");
+  int battery_percent = charge.charge_percent;
+    
+  charge_layer = inverter_layer_create(GRect(0, 0, 144, 8));
+  
+  if (charge.is_charging) {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Battery Chargeing");
+    bat_empty_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_CHARGEING);
+    bat_empty_10_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_CHARGEING_10);
+    bat_empty_90_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_CHARGEING_90);
+  } else {
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Battery Not Chargeing");
+    bat_empty_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_EMPTY);
+    bat_empty_10_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_EMPTY);
+    bat_empty_90_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_EMPTY);
+  }
+  
+  if (battery_percent >= 100){
+    bat_10_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CHARGED_ICON);
+    bat_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CHARGED_ICON);
+    bat_90_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CHARGED_ICON);
+  } else {
+    bat_10_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_10);
+    bat_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON);
+    bat_90_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_90);
+  }
+  
+  if(battery_percent >= 10) {
+    bitmap_layer_set_bitmap(bat_10_layer, bat_10_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_10_layer, bat_empty_10_bitmap);
+  }
+  if(battery_percent >= 20) {
+    bitmap_layer_set_bitmap(bat_20_layer, bat_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_20_layer, bat_empty_bitmap);
+  }
+  if(battery_percent >= 30) {
+    bitmap_layer_set_bitmap(bat_30_layer, bat_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_30_layer, bat_empty_bitmap);
+  }
+  if(battery_percent >= 40) {
+    bitmap_layer_set_bitmap(bat_40_layer, bat_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_40_layer, bat_empty_bitmap);
+  }
+  if(battery_percent >= 50) {
+    bitmap_layer_set_bitmap(bat_50_layer, bat_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_50_layer, bat_empty_bitmap);
+  }
+  if(battery_percent >= 60) {
+    bitmap_layer_set_bitmap(bat_60_layer, bat_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_60_layer, bat_empty_bitmap);
+  }
+  if(battery_percent >= 70) {
+    bitmap_layer_set_bitmap(bat_70_layer, bat_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_70_layer, bat_empty_bitmap);
+  }
+  if(battery_percent >= 80) {
+    bitmap_layer_set_bitmap(bat_80_layer, bat_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_80_layer, bat_empty_bitmap);
+  }
+  if(battery_percent >= 90) {
+    bitmap_layer_set_bitmap(bat_90_layer, bat_90_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_90_layer, bat_empty_90_bitmap);
+  }
+}
+
+void handle_init(void) {
+  //Create a Window and values
+  window = window_create();
+  time_layer = text_layer_create(GRect(0,50,144,168));
+  date_layer = text_layer_create(GRect(0,150,144,168));
+  bat_10_layer = bitmap_layer_create(GRect(0, 0, 16, 8));
+  bat_20_layer = bitmap_layer_create(GRect(16, 0, 16, 8));
+  bat_30_layer = bitmap_layer_create(GRect(32, 0, 16, 8));
+  bat_40_layer = bitmap_layer_create(GRect(48, 0, 16, 8));
+  bat_50_layer = bitmap_layer_create(GRect(64, 0, 16, 8));
+  bat_60_layer = bitmap_layer_create(GRect(80, 0, 16, 8));
+  bat_70_layer = bitmap_layer_create(GRect(96, 0, 16, 8));
+  bat_80_layer = bitmap_layer_create(GRect(112, 0, 16, 8));
+  bat_90_layer = bitmap_layer_create(GRect(128, 0, 16, 8));
+  charge_layer = inverter_layer_create(GRect(0, 0, 144, 8));
+
+  bat_10_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_10);
+  bat_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON);
+  bat_90_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_90);
+  bat_empty_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_EMPTY);
+  bat_empty_10_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_EMPTY);
+  bat_empty_90_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_EMPTY);
+  bitmap_layer_set_bitmap(bat_10_layer, bat_10_bitmap);
+  
+  //Track time and battery
+  tick_timer_service_subscribe(MINUTE_UNIT, handle_timetick);
+  battery_state_service_subscribe(handle_battery);
+  
+  //Load Fonts
+  ResHandle time_font_handle = resource_get_handle(RESOURCE_ID_KARNIVOR_49);
+  ResHandle date_font_handle = resource_get_handle(RESOURCE_ID_KARNIVOR_16);
+  
+  //Set font and alingment
+  text_layer_set_font(time_layer, fonts_load_custom_font(time_font_handle));
+  text_layer_set_text_alignment(time_layer, GTextAlignmentCenter);
+  text_layer_set_font(date_layer, fonts_load_custom_font(date_font_handle));
+  text_layer_set_text_alignment(date_layer, GTextAlignmentCenter);
+  
+  //set Battery bar to correct value
+  BatteryChargeState charge_state = battery_state_service_peek();
+  int battery_percent = charge_state.charge_percent;
+  if(battery_percent >= 10) {
+    bitmap_layer_set_bitmap(bat_10_layer, bat_10_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_10_layer, bat_empty_bitmap);
+  }
+  if(battery_percent >= 20) {
+    bitmap_layer_set_bitmap(bat_20_layer, bat_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_20_layer, bat_empty_bitmap);
+  }
+  if(battery_percent >= 30) {
+    bitmap_layer_set_bitmap(bat_30_layer, bat_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_30_layer, bat_empty_bitmap);
+  }
+  if(battery_percent >= 40) {
+    bitmap_layer_set_bitmap(bat_40_layer, bat_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_40_layer, bat_empty_bitmap);
+  }
+  if(battery_percent >= 50) {
+    bitmap_layer_set_bitmap(bat_50_layer, bat_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_50_layer, bat_empty_bitmap);
+  }
+  if(battery_percent >= 60) {
+    bitmap_layer_set_bitmap(bat_60_layer, bat_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_60_layer, bat_empty_bitmap);
+  }
+  if(battery_percent >= 70) {
+    bitmap_layer_set_bitmap(bat_70_layer, bat_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_70_layer, bat_empty_bitmap);
+  }
+  if(battery_percent >= 80) {
+    bitmap_layer_set_bitmap(bat_80_layer, bat_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_80_layer, bat_empty_bitmap);
+  }
+  if(battery_percent >= 90) {
+    bitmap_layer_set_bitmap(bat_90_layer, bat_90_bitmap);
+  } else {
+    bitmap_layer_set_bitmap(bat_90_layer, bat_empty_bitmap);
+  }
+  
+  //add layers to the window
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(time_layer));
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(date_layer));
+  
+  //Add battery bars to window
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bat_10_layer));
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bat_20_layer));
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bat_30_layer));
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bat_40_layer));
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bat_50_layer));
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bat_60_layer));
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bat_70_layer));
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bat_80_layer));
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bat_90_layer));
+  layer_add_child(window_get_root_layer(window), (Layer*) charge_layer);
+  
+  //Inverter layer
+  inv_layer = inverter_layer_create(GRect(0, 8, 144, 160));
+  layer_add_child(window_get_root_layer(window), (Layer*) inv_layer);
+  
+  //push the Window
+  window_stack_push(window, true);
+}
+
+void handle_deinit(void) {
+  gbitmap_destroy(bat_bitmap);
+  gbitmap_destroy(bat_10_bitmap);
+  gbitmap_destroy(bat_90_bitmap);
+  
+  bitmap_layer_destroy(bat_10_layer);
+  bitmap_layer_destroy(bat_20_layer);
+  bitmap_layer_destroy(bat_30_layer);
+  bitmap_layer_destroy(bat_40_layer);
+  bitmap_layer_destroy(bat_50_layer);
+  bitmap_layer_destroy(bat_60_layer);
+  bitmap_layer_destroy(bat_70_layer);
+  bitmap_layer_destroy(bat_80_layer);
+  bitmap_layer_destroy(bat_90_layer);
+
+  tick_timer_service_unsubscribe();
+  battery_state_service_unsubscribe();
+  inverter_layer_destroy(charge_layer);
+  inverter_layer_destroy(inv_layer);
+  text_layer_destroy(time_layer);
+  text_layer_destroy(date_layer);
+  window_destroy(window);
+}
+
+int main(void) {
+  handle_init();
+  app_event_loop();
+  handle_deinit();
+}

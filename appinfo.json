@@ -1,0 +1,84 @@
+{
+    "appKeys": {},
+    "capabilities": [
+        ""
+    ],
+    "companyName": "tynellis@gmail.com",
+    "longName": "Simple Watch",
+    "projectType": "native",
+    "resources": {
+        "media": [
+            {
+                "file": "images/ChargedIcon.png",
+                "name": "CHARGED_ICON",
+                "type": "png"
+            },
+            {
+                "file": "images/BatteryIconCharging10.png",
+                "name": "BAT_ICON_CHARGEING_10",
+                "type": "png"
+            },
+            {
+                "file": "images/BatteryIconCharging90.png",
+                "name": "BAT_ICON_CHARGEING_90",
+                "type": "png"
+            },
+            {
+                "file": "images/BatteryIconCharging.png",
+                "name": "BAT_ICON_CHARGEING",
+                "type": "png"
+            },
+            {
+                "characterRegex": "[0-9:]",
+                "file": "fonts/loaded.ttf",
+                "name": "LOADED_48",
+                "type": "font"
+            },
+            {
+                "file": "images/SimpleWatchSmall.png",
+                "menuIcon": true,
+                "name": "WATCH_ICON",
+                "type": "png"
+            },
+            {
+                "file": "images/BatteryIconEmpty.png",
+                "name": "BAT_ICON_EMPTY",
+                "type": "png"
+            },
+            {
+                "file": "images/BatteryIcon90.png",
+                "name": "BAT_ICON_90",
+                "type": "png"
+            },
+            {
+                "file": "images/BatteryIcon10.png",
+                "name": "BAT_ICON_10",
+                "type": "png"
+            },
+            {
+                "file": "images/BatteryIcon.png",
+                "name": "BAT_ICON",
+                "type": "png"
+            },
+            {
+                "characterRegex": "[o0-9:]",
+                "file": "fonts/KARNIVOR.ttf",
+                "name": "KARNIVOR_49",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[A-Za-z0-9:]",
+                "file": "fonts/KARNIVOR.ttf",
+                "name": "KARNIVOR_16",
+                "type": "font"
+            }
+        ]
+    },
+    "shortName": "Simple Watch",
+    "uuid": "129197d0-704e-4a05-ae70-4615f1893018",
+    "versionCode": 1,
+    "versionLabel": "1.0",
+    "watchapp": {
+        "watchface": true
+    }
+}
