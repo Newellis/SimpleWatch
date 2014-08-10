@@ -9,6 +9,18 @@
     "resources": {
         "media": [
             {
+                "characterRegex": "[JFMASONDa-z 0-9]",
+                "file": "fonts/Akashi.ttf",
+                "name": "AKASHI_16",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[0-9: ]",
+                "file": "fonts/Akashi.ttf",
+                "name": "AKASHI_48",
+                "type": "font"
+            },
+            {
                 "file": "images/ChargedIcon.png",
                 "name": "CHARGED_ICON",
                 "type": "png"
@@ -27,12 +39,6 @@
                 "file": "images/BatteryIconCharging.png",
                 "name": "BAT_ICON_CHARGEING",
                 "type": "png"
-            },
-            {
-                "characterRegex": "[0-9:]",
-                "file": "fonts/loaded.ttf",
-                "name": "LOADED_48",
-                "type": "font"
             },
             {
                 "file": "images/SimpleWatchSmall.png",

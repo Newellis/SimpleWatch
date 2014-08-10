@@ -100,8 +100,8 @@ void handle_battery(BatteryChargeState charge) {
 void handle_init(void) {
   //Create a Window and values
   window = window_create();
-  time_layer = text_layer_create(GRect(0,50,144,168));
-  date_layer = text_layer_create(GRect(0,150,144,168));
+  time_layer = text_layer_create(GRect(0,50,144,118));
+  date_layer = text_layer_create(GRect(0,148,144,20));
   bat_10_layer = bitmap_layer_create(GRect(0, 0, 16, 8));
   bat_20_layer = bitmap_layer_create(GRect(16, 0, 16, 8));
   bat_30_layer = bitmap_layer_create(GRect(32, 0, 16, 8));
@@ -126,8 +126,8 @@ void handle_init(void) {
   battery_state_service_subscribe(handle_battery);
   
   //Load Fonts
-  ResHandle time_font_handle = resource_get_handle(RESOURCE_ID_KARNIVOR_49);
-  ResHandle date_font_handle = resource_get_handle(RESOURCE_ID_KARNIVOR_16);
+  ResHandle time_font_handle = resource_get_handle(RESOURCE_ID_AKASHI_48);
+  ResHandle date_font_handle = resource_get_handle(RESOURCE_ID_AKASHI_16);
   
   //Set font and alingment
   text_layer_set_font(time_layer, fonts_load_custom_font(time_font_handle));
