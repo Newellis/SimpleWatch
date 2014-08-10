@@ -9,6 +9,16 @@
     "resources": {
         "media": [
             {
+                "file": "images/ChargedIcon90.png",
+                "name": "CHARGED_ICON_90",
+                "type": "png"
+            },
+            {
+                "file": "images/ChargedIcon10.png",
+                "name": "CHARGED_ICON_10",
+                "type": "png"
+            },
+            {
                 "characterRegex": "[JFMASONDa-z 0-9]",
                 "file": "fonts/Akashi.ttf",
                 "name": "AKASHI_16",

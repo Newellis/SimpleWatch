@@ -37,9 +37,9 @@ void handle_battery(BatteryChargeState charge) {
   //change battery bitmap and bitmap layers based on battery percent
   int battery_percent = charge.charge_percent;
   if (battery_percent >= 100){
-    bat_10_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CHARGED_ICON);
+    bat_10_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CHARGED_ICON_10);
     bat_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CHARGED_ICON);
-    bat_90_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CHARGED_ICON);
+    bat_90_bitmap = gbitmap_create_with_resource(RESOURCE_ID_CHARGED_ICON_90);
   } else {
     bat_10_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_10);
     bat_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON);
