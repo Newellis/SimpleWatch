@@ -10,15 +10,24 @@ void handle_timetick(struct tm *tick_time, TimeUnits units_changed){
   //set date and time buffers
   static char time_buffer[10];
   static char date_buffer[20];
-  if (clock_is_24h_style()) {
+  if (clock_is_24h_style()) { //check the 24 hr time pebble setting and get correct time format
     strftime(time_buffer, sizeof(time_buffer), "%H:%M", tick_time);
   } else {
     strftime(time_buffer, sizeof(time_buffer), "%I:%M", tick_time);
   }
-  strftime(date_buffer, sizeof(date_buffer), "%b %d", tick_time);
+  char *time_ptr = time_buffer;//remove preceding 0 on hour
+  if (time_buffer[0] == '0') {
+    time_ptr++;
+  }
+  strftime(date_buffer, sizeof(date_buffer), "%e", tick_time);
+  if (date_buffer[0] == ' ') { //remove preceding 0 on day
+    strftime(date_buffer, sizeof(date_buffer), "%b%e", tick_time);
+  } else {
+    strftime(date_buffer, sizeof(date_buffer), "%b %e", tick_time);
+  }
   
   //set text layers to display date and time buffers
-  text_layer_set_text(time_layer, time_buffer);
+  text_layer_set_text(time_layer, time_ptr);
   text_layer_set_text(date_layer, date_buffer);
 }
 
