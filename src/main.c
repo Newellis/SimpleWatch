@@ -3,7 +3,7 @@
 Window *window;
 TextLayer *time_layer, *date_layer;
 InverterLayer *inv_layer;
-GBitmap *bat_bitmap, *bat_10_bitmap, *bat_90_bitmap, *bat_empty_bitmap, *bat_empty_10_bitmap, *bat_empty_90_bitmap;
+GBitmap *bat_bitmap, *bat_10_bitmap, *bat_90_bitmap, *bat_empty_bitmap, *bat_empty_90_bitmap;
 BitmapLayer *bat_10_layer, *bat_20_layer, *bat_30_layer, *bat_40_layer, *bat_50_layer, *bat_60_layer, *bat_70_layer, *bat_80_layer, *bat_90_layer;
 
 void handle_timetick(struct tm *tick_time, TimeUnits units_changed){
@@ -35,11 +35,9 @@ void handle_battery(BatteryChargeState charge) {
   //change battery bitmaps if charging
   if (charge.is_charging) {
     bat_empty_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_CHARGEING);
-    bat_empty_10_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_CHARGEING_10);
     bat_empty_90_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_CHARGEING_90);
   } else {
     bat_empty_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_EMPTY);
-    bat_empty_10_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_EMPTY);
     bat_empty_90_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_EMPTY);
   }
   
@@ -54,11 +52,7 @@ void handle_battery(BatteryChargeState charge) {
     bat_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON);
     bat_90_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_90);
   }
-  if(battery_percent >= 10) {
-    bitmap_layer_set_bitmap(bat_10_layer, bat_10_bitmap);
-  } else {
-    bitmap_layer_set_bitmap(bat_10_layer, bat_empty_10_bitmap);
-  }
+  bitmap_layer_set_bitmap(bat_10_layer, bat_10_bitmap);
   if(battery_percent >= 20) {
     bitmap_layer_set_bitmap(bat_20_layer, bat_bitmap);
   } else {
@@ -120,7 +114,6 @@ void handle_init(void) {
   bat_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON);
   bat_90_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_90);
   bat_empty_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_EMPTY);
-  bat_empty_10_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_EMPTY);
   bat_empty_90_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_EMPTY);
   bitmap_layer_set_bitmap(bat_10_layer, bat_10_bitmap);
   
@@ -181,7 +174,6 @@ void handle_deinit(void) {
   gbitmap_destroy(bat_90_bitmap);
   gbitmap_destroy(bat_empty_bitmap);
   gbitmap_destroy(bat_empty_90_bitmap);
-  gbitmap_destroy(bat_empty_10_bitmap);
 
   //end bitmap layers
   bitmap_layer_destroy(bat_10_layer);
