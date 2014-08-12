@@ -53,6 +53,7 @@ void handle_battery(BatteryChargeState charge) {
     bat_90_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_90);
   }
   bitmap_layer_set_bitmap(bat_10_layer, bat_10_bitmap);
+  
   if(battery_percent >= 20) {
     bitmap_layer_set_bitmap(bat_20_layer, bat_bitmap);
   } else {
@@ -100,15 +101,15 @@ void handle_init(void) {
   window = window_create();
   time_layer = text_layer_create(GRect(0,50,144,118));
   date_layer = text_layer_create(GRect(0,148,144,20));
-  bat_10_layer = bitmap_layer_create(GRect(0, 0, 16, 8));
-  bat_20_layer = bitmap_layer_create(GRect(16, 0, 16, 8));
-  bat_30_layer = bitmap_layer_create(GRect(32, 0, 16, 8));
-  bat_40_layer = bitmap_layer_create(GRect(48, 0, 16, 8));
-  bat_50_layer = bitmap_layer_create(GRect(64, 0, 16, 8));
-  bat_60_layer = bitmap_layer_create(GRect(80, 0, 16, 8));
-  bat_70_layer = bitmap_layer_create(GRect(96, 0, 16, 8));
-  bat_80_layer = bitmap_layer_create(GRect(112, 0, 16, 8));
-  bat_90_layer = bitmap_layer_create(GRect(128, 0, 16, 8));
+  bat_10_layer = bitmap_layer_create(GRect(0, 0, 16, 9));
+  bat_20_layer = bitmap_layer_create(GRect(16, 0, 16, 9));
+  bat_30_layer = bitmap_layer_create(GRect(32, 0, 16, 9));
+  bat_40_layer = bitmap_layer_create(GRect(48, 0, 16, 9));
+  bat_50_layer = bitmap_layer_create(GRect(64, 0, 16, 9));
+  bat_60_layer = bitmap_layer_create(GRect(80, 0, 16, 9));
+  bat_70_layer = bitmap_layer_create(GRect(96, 0, 16, 9));
+  bat_80_layer = bitmap_layer_create(GRect(112, 0, 16, 9));
+  bat_90_layer = bitmap_layer_create(GRect(128, 0, 16, 9));
 
   bat_10_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON_10);
   bat_bitmap = gbitmap_create_with_resource(RESOURCE_ID_BAT_ICON);
