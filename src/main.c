@@ -17,7 +17,6 @@ void handle_timetick(struct tm *tick_time, TimeUnits units_changed){
   static char time_buffer[10];
   static char month_buffer[20];
   static char day_buffer[20];
-  char *time_ptr = time_buffer;
 
   //if time changed
   if(units_changed & MINUTE_UNIT) {
@@ -28,10 +27,13 @@ void handle_timetick(struct tm *tick_time, TimeUnits units_changed){
     } else {
       strftime(time_buffer, sizeof(time_buffer), "%I:%M", tick_time);
     }
+    char *time_ptr = time_buffer;
     if (time_buffer[0] == '0') { //remove preceding 0 on hour
       time_ptr++;
     }
-    chngChar(time_buffer, '0', 'o'); //compensate for fonts zero being bad
+    chngChar(time_ptr, '0', 'o'); //compensate for fonts zero being bad
+    //set text layers to display time buffer
+    text_layer_set_text(time_layer, time_ptr);
   } 
   //if day changed
   if(units_changed & DAY_UNIT) {
@@ -44,12 +46,10 @@ void handle_timetick(struct tm *tick_time, TimeUnits units_changed){
       strftime(day_buffer, sizeof(day_buffer), " %e", tick_time);
     }
     chngChar(day_buffer, '0', 'o'); //compensate for fonts zero being bad
+    //set text layers to display date buffers
+    text_layer_set_text(month_layer, month_buffer);
+    text_layer_set_text(day_layer, day_buffer);
   }
-  
-  //set text layers to display date and time buffers
-  text_layer_set_text(time_layer, time_ptr);
-  text_layer_set_text(month_layer, month_buffer);
-  text_layer_set_text(day_layer, day_buffer);
 }
 
 void handle_battery(BatteryChargeState charge) {      
