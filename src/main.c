@@ -1,34 +1,55 @@
 #include <pebble.h>
 
 Window *window;
-TextLayer *time_layer, *date_layer;
+TextLayer *time_layer, *month_layer, *day_layer;
 InverterLayer *inv_layer;
 GBitmap *bat_bitmap, *bat_10_bitmap, *bat_90_bitmap, *bat_empty_bitmap, *bat_empty_90_bitmap;
 BitmapLayer *bat_10_layer, *bat_20_layer, *bat_30_layer, *bat_40_layer, *bat_50_layer, *bat_60_layer, *bat_70_layer, *bat_80_layer, *bat_90_layer;
 
+
+char *chngChar(char *str, char oldChar, char newChar) {
+    char *strPtr = str;
+    while ((strPtr = strchr (strPtr, oldChar)) != NULL)
+        *strPtr++ = newChar;
+    return str;
+}
 void handle_timetick(struct tm *tick_time, TimeUnits units_changed){
-  //set date and time buffers
   static char time_buffer[10];
-  static char date_buffer[20];
-  if (clock_is_24h_style()) { //check the 24 hr time pebble setting and get correct time format
-    strftime(time_buffer, sizeof(time_buffer), "%H:%M", tick_time);
-  } else {
-    strftime(time_buffer, sizeof(time_buffer), "%I:%M", tick_time);
-  }
-  char *time_ptr = time_buffer;//remove preceding 0 on hour
-  if (time_buffer[0] == '0') {
-    time_ptr++;
-  }
-  strftime(date_buffer, sizeof(date_buffer), "%e", tick_time);
-  if (date_buffer[0] == ' ') { //remove preceding 0 on day
-    strftime(date_buffer, sizeof(date_buffer), "%b%e", tick_time);
-  } else {
-    strftime(date_buffer, sizeof(date_buffer), "%b %e", tick_time);
+  static char month_buffer[20];
+  static char day_buffer[20];
+  char *time_ptr = time_buffer;
+
+  //if time changed
+  if(units_changed & MINUTE_UNIT) {
+  //set time buffer
+    //check the 24 hr time pebble setting and get correct time format
+    if (clock_is_24h_style()) { 
+      strftime(time_buffer, sizeof(time_buffer), "%H:%M", tick_time);
+    } else {
+      strftime(time_buffer, sizeof(time_buffer), "%I:%M", tick_time);
+    }
+    if (time_buffer[0] == '0') { //remove preceding 0 on hour
+      time_ptr++;
+    }
+    chngChar(time_buffer, '0', 'o'); //compensate for fonts zero being bad
+  } 
+  //if day changed
+  if(units_changed & DAY_UNIT) {
+  //set date buffers
+    strftime(month_buffer, sizeof(month_buffer), "%b", tick_time);
+    strftime(day_buffer, sizeof(day_buffer), "%e", tick_time);
+    if (day_buffer[0] == ' ') { //remove preceding 0 on day
+      strftime(day_buffer, sizeof(day_buffer), "%e", tick_time);
+    } else {
+      strftime(day_buffer, sizeof(day_buffer), " %e", tick_time);
+    }
+    chngChar(day_buffer, '0', 'o'); //compensate for fonts zero being bad
   }
   
   //set text layers to display date and time buffers
   text_layer_set_text(time_layer, time_ptr);
-  text_layer_set_text(date_layer, date_buffer);
+  text_layer_set_text(month_layer, month_buffer);
+  text_layer_set_text(day_layer, day_buffer);
 }
 
 void handle_battery(BatteryChargeState charge) {      
@@ -100,7 +121,8 @@ void handle_init(void) {
   //Create a Window and values
   window = window_create();
   time_layer = text_layer_create(GRect(0,50,144,118));
-  date_layer = text_layer_create(GRect(0,148,144,20));
+  month_layer = text_layer_create(GRect(0,148,79,20));
+  day_layer = text_layer_create(GRect(74,148,63,20));
   bat_10_layer = bitmap_layer_create(GRect(0, 0, 16, 9));
   bat_20_layer = bitmap_layer_create(GRect(16, 0, 16, 9));
   bat_30_layer = bitmap_layer_create(GRect(32, 0, 16, 9));
@@ -119,23 +141,27 @@ void handle_init(void) {
   bitmap_layer_set_bitmap(bat_10_layer, bat_10_bitmap);
   
   //Track time and battery
-  tick_timer_service_subscribe(MINUTE_UNIT, handle_timetick);
+  tick_timer_service_subscribe(MINUTE_UNIT | DAY_UNIT, handle_timetick);
   battery_state_service_subscribe(handle_battery);
   
   //Load Fonts
-  ResHandle time_font_handle = resource_get_handle(RESOURCE_ID_AKASHI_48);
+  ResHandle time_font_handle = resource_get_handle(RESOURCE_ID_KARNIVORE_49);
   ResHandle date_font_handle = resource_get_handle(RESOURCE_ID_AKASHI_16);
+  ResHandle day_font_handle = resource_get_handle(RESOURCE_ID_KARNIVORE_16);
   
   //Set font and alingment
   text_layer_set_font(time_layer, fonts_load_custom_font(time_font_handle));
   text_layer_set_text_alignment(time_layer, GTextAlignmentCenter);
-  text_layer_set_font(date_layer, fonts_load_custom_font(date_font_handle));
-  text_layer_set_text_alignment(date_layer, GTextAlignmentCenter);
+  text_layer_set_font(month_layer, fonts_load_custom_font(date_font_handle));
+  text_layer_set_text_alignment(month_layer, GTextAlignmentRight);
+  text_layer_set_font(day_layer, fonts_load_custom_font(day_font_handle));
+  text_layer_set_text_alignment(day_layer, GTextAlignmentLeft);
   
-  //set Time to current value
+  //set time and date to current value
   time_t now = time(NULL);
   struct tm *current_time = localtime(&now);
   handle_timetick(current_time, MINUTE_UNIT);
+  handle_timetick(current_time, DAY_UNIT);
   
   //set Battery bar to correct value
   BatteryChargeState charge_state = battery_state_service_peek();
@@ -143,7 +169,8 @@ void handle_init(void) {
   
   //add layers to the window
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(time_layer));
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(date_layer));
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(day_layer));
+  layer_add_child(window_get_root_layer(window), text_layer_get_layer(month_layer));
   
   //Add battery bars to window
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bat_10_layer));
@@ -189,7 +216,8 @@ void handle_deinit(void) {
   
   //end text layers and window
   text_layer_destroy(time_layer);
-  text_layer_destroy(date_layer);
+  text_layer_destroy(month_layer);
+  text_layer_destroy(day_layer);
   inverter_layer_destroy(inv_layer);
   window_destroy(window);
 }

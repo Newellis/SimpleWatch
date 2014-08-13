@@ -9,6 +9,18 @@
     "resources": {
         "media": [
             {
+                "characterRegex": "[o1-9]",
+                "file": "fonts/KARNIVOR.ttf",
+                "name": "KARNIVORE_16",
+                "type": "font"
+            },
+            {
+                "characterRegex": "[o1-9:]",
+                "file": "fonts/KARNIVOR.ttf",
+                "name": "KARNIVORE_49",
+                "type": "font"
+            },
+            {
                 "file": "images/ChargedIcon90.png",
                 "name": "CHARGED_ICON_90",
                 "type": "png"
